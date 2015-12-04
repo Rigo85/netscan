@@ -49,7 +49,7 @@ public class NetScanPresenter {
     public NetScanPresenter(NetScanView netScanView) {
         this.netScanView = netScanView;
 
-        conf = ConfigurationUtil.loadConfiguration("configuration.json");
+        conf = ConfigurationUtil.loadConfiguration();
 
         settingsView = new SettingsView();
         new SettingsPresenter(settingsView, conf);
