@@ -15,23 +15,22 @@ import javafx.scene.layout.VBox;
  * AGPL (http:www.gnu.org/licenses/agpl-3.0.txt) for more details.
  */
 public class SettingsView extends VBox {
+    final ThreadsView threadsView;
+    final GenericView rangesView;
+    final GenericView credentialsView;
+    final GenericView filtersView;
 
     public SettingsView() {
-        //todo load from file default # of threads.
-        ThreadsView threadsView = new ThreadsView(50);
-        new ThreadsPresenter(threadsView);
+        threadsView = new ThreadsView(50);
 
-        GenericView rangesView = new GenericView("Ranges");
+        rangesView = new GenericView("Ranges");
         VBox.setMargin(rangesView, new Insets(0, 0, 8, 0));
-        new RangePresenter(rangesView);
 
-        GenericView credentialsView = new GenericView("Credentials");
+        credentialsView = new GenericView("Credentials");
         VBox.setMargin(credentialsView, new Insets(0, 0, 8, 0));
-        new CredentialsPresenter(credentialsView);
 
-        GenericView filtersView = new GenericView("Filters");
+        filtersView = new GenericView("Filters");
         VBox.setMargin(filtersView, new Insets(0, 0, 8, 0));
-        new FilterPresenter(filtersView);
 
         getChildren().addAll(threadsView, rangesView, credentialsView, filtersView);
     }

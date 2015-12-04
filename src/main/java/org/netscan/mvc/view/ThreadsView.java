@@ -1,6 +1,5 @@
 package org.netscan.mvc.view;
 
-import javafx.beans.property.SimpleIntegerProperty;
 import javafx.geometry.Insets;
 import javafx.scene.control.Label;
 import javafx.scene.control.Spinner;
@@ -18,8 +17,8 @@ import javafx.scene.layout.GridPane;
  * AGPL (http:www.gnu.org/licenses/agpl-3.0.txt) for more details.
  */
 public class ThreadsView extends GridPane {
-    Label threadCountLabel;
-    Spinner<SimpleIntegerProperty> threadCount;
+    final Label threadCountLabel;
+    final Spinner<Integer> threadCount;
 
     public ThreadsView(int max) {
         threadCountLabel = new Label("Max. threads");

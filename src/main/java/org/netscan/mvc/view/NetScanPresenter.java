@@ -1,18 +1,32 @@
 package org.netscan.mvc.view;
 
+
 import javafx.application.Platform;
-import javafx.scene.control.Alert;
-import javafx.scene.control.ButtonBar;
-import javafx.scene.control.ButtonType;
-import javafx.scene.control.Dialog;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.concurrent.Worker;
+import javafx.scene.control.*;
 import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.layout.GridPane;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
-import org.netscan.mvc.model.Filter;
+import jcifs.smb.NtlmPasswordAuthentication;
+import jcifs.smb.SmbException;
+import org.netscan.core.configuration.Configuration;
+import org.netscan.core.configuration.ConfigurationUtil;
+import org.netscan.core.configuration.Filter;
+import org.netscan.mvc.model.SearchService;
+import org.netscan.mvc.model.Share;
 
+import java.io.IOException;
+import java.nio.file.Paths;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Optional;
+
 
 /**
  * Author Rigoberto Leander Salgado Reyes <rlsalgado2006@gmail.com>
@@ -27,16 +41,30 @@ import java.util.Optional;
  */
 public class NetScanPresenter {
     private final NetScanView netScanView;
+    private final Configuration conf;
+    final SettingsView settingsView;
+    final SearchService searchService;
+    private final ObservableList<Share> list;
 
     public NetScanPresenter(NetScanView netScanView) {
-
         this.netScanView = netScanView;
+
+        conf = ConfigurationUtil.loadConfiguration("configuration.json");
+
+        settingsView = new SettingsView();
+        new SettingsPresenter(settingsView, conf);
+
+        searchService = new SearchService(conf);
+
+        list = FXCollections.observableArrayList();
 
         attachEvents();
     }
 
+    @SuppressWarnings("unchecked")
     private void attachEvents() {
         netScanView.settings.setOnAction(e -> settingsAction());
+
         netScanView.about.setOnAction(e -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION, "", ButtonType.OK);
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
@@ -56,6 +84,7 @@ public class NetScanPresenter {
             alert.setTitle("About Dialog");
             alert.showAndWait();
         });
+
         netScanView.exit.setOnAction(e -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to exit?", ButtonType.YES, ButtonType.CANCEL);
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
@@ -64,13 +93,133 @@ public class NetScanPresenter {
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == ButtonType.YES) Platform.exit();
         });
-        netScanView.filterComboBox.getItems().addAll(new Filter("*.mpg", "*.avi"));
+
+        netScanView.filterComboBox.itemsProperty().bind(settingsView.filtersView.listView.itemsProperty());
+
+        netScanView.searchButton.setOnAction(e -> searchEvent());
+        netScanView.searchButton.disableProperty().bind(searchService.stateProperty().isEqualTo(Worker.State.RUNNING));
+
+        netScanView.searchTextField.disableProperty().bind(searchService.stateProperty().isEqualTo(Worker.State.RUNNING));
+        netScanView.searchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
+            if (!newValue.isEmpty()) {
+                final FilteredList<Share> filtered =
+                        list.filtered(dt -> dt.getSmbPath().toLowerCase().contains(newValue.trim().toLowerCase()));
+                netScanView.tableView.setItems(filtered);
+            } else {
+                netScanView.tableView.setItems(list);
+            }
+        });
+
+        netScanView.openFileManager.setOnAction(e -> openFileManagerAction());
+
+        netScanView.credentials.setOnAction(e -> credentialsAction());
+    }
+
+    private void credentialsAction() {
+        final Share share = netScanView.tableView.getSelectionModel().getSelectedItem();
+
+        if (share != null) {
+            final NtlmPasswordAuthentication auth = share.getAuth();
+
+            Dialog dialog = new Dialog();
+            dialog.setTitle("Credentials");
+            dialog.setResizable(true);
+
+            Stage stage = (Stage) dialog.getDialogPane().getScene().getWindow();
+            stage.getIcons().add(new Image(
+                    getClass().getClassLoader().getResource("images/icon.png").toExternalForm()));
+
+            Label label1 = new Label("Domain: ");
+            Label label2 = new Label("Username: ");
+            Label label3 = new Label("Password: ");
+
+            TextField text1 = new TextField();
+            text1.setPrefWidth(250);
+            text1.setText(auth.getDomain());
+            text1.setEditable(false);
+
+            TextField text2 = new TextField();
+            text2.setPrefWidth(250);
+            text2.setText(auth.getUsername());
+            text2.setEditable(false);
+
+            TextField text3 = new TextField();
+            text3.setPrefWidth(250);
+            text3.setText(auth.getPassword());
+            text3.setEditable(false);
+
+            GridPane grid = new GridPane();
+            grid.add(label1, 1, 1);
+            grid.add(text1, 2, 1);
+            grid.add(label2, 1, 2);
+            grid.add(text2, 2, 2);
+            grid.add(label3, 1, 3);
+            grid.add(text3, 2, 3);
+            grid.setHgap(10);
+            grid.setVgap(10);
+            dialog.getDialogPane().setContent(grid);
+
+            dialog.getDialogPane().getButtonTypes().add(ButtonType.CLOSE);
+
+            dialog.showAndWait();
+        }
+    }
+
+    //fixme improve.
+    private void openFileManagerAction() {
+        final Share share = netScanView.tableView.getSelectionModel().getSelectedItem();
+
+        if (share != null) {
+            String comm = String
+                    .format("%s %s", System.getProperty("os.name").contains("Windows") ? "explorer" : "xdg-open",
+                            Paths.get(share.getSmbPath()).getParent().toString().replace("smb:/", "smb://"));
+            try {
+                System.out.println(comm);
+                Runtime.getRuntime().exec(comm);
+            } catch (IOException ignored) {
+            }
+        }
+    }
+
+    private void searchEvent() {
+        netScanView.searchTextField.setText("");
+        netScanView.tableView.getItems().clear();
+        final Filter filter = netScanView.filterComboBox.getValue();
+        if (!conf.getCredentials().isEmpty() && filter != null && !conf.getRanges().isEmpty()) {
+            if (searchService.getState() == Worker.State.READY) {
+                searchService.valueProperty().addListener((observable, oldValue, smbFiles) -> {
+                    if (smbFiles != null && !smbFiles.isEmpty()) {
+                        smbFiles.stream().forEach(sf -> {
+                            try {
+                                final Share share = new Share(sf.getName(), sf.getCanonicalPath(), sf.length(),
+                                        new Date(sf.getDate()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
+                                        (NtlmPasswordAuthentication) sf.getPrincipal());
+                                netScanView.tableView.getItems().add(share);
+                            } catch (SmbException ignored) {
+                            }
+                        });
+
+                        searchService.canContinue();
+                    }
+                });
+            }
+
+            if (searchService.getState() == Worker.State.SUCCEEDED ||
+                    searchService.getState() == Worker.State.FAILED ||
+                    searchService.getState() == Worker.State.CANCELLED) searchService.reset();
+
+            searchService.setFilter(filter);
+            searchService.setOnSucceeded(e -> onSuccessSearch());
+            searchService.start();
+        }
+    }
+
+    private void onSuccessSearch() {
+        list.clear();
+        list.addAll(netScanView.tableView.getItems());
     }
 
     private void settingsAction() {
-        SettingsView settingsView = new SettingsView();
-        new SettingsPresenter(settingsView);
-
         Dialog dialog = new Dialog();
         dialog.setTitle("Settings");
         dialog.initModality(Modality.APPLICATION_MODAL);
@@ -80,10 +229,8 @@ public class NetScanPresenter {
         stage.getIcons().add(new Image(
                 getClass().getClassLoader().getResource("images/icon.png").toExternalForm()));
 
-        ButtonType reloadButtonType = new ButtonType("Reload", ButtonBar.ButtonData.OTHER);
-        ButtonType saveButtonType = new ButtonType("Save", ButtonBar.ButtonData.OTHER);
+        dialog.getDialogPane().getButtonTypes().addAll(ButtonType.CLOSE);
 
-        dialog.getDialogPane().getButtonTypes().addAll(reloadButtonType, saveButtonType, ButtonType.CLOSE);
         dialog.getDialogPane().setContent(settingsView);
         dialog.getDialogPane().setPrefWidth(500);
 
@@ -93,6 +240,4 @@ public class NetScanPresenter {
 
         dialog.showAndWait();
     }
-
-
 }

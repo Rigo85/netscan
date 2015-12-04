@@ -20,10 +20,10 @@ import javafx.scene.layout.VBox;
  * AGPL (http:www.gnu.org/licenses/agpl-3.0.txt) for more details.
  */
 public class GenericView extends BorderPane {
-    ListView listView;
-    VBox buttonBar;
-    Button addButton;
-    Button removeButton;
+    final ListView listView;
+    final VBox buttonBar;
+    final Button addButton;
+    final Button removeButton;
 
     public GenericView(String title) {
         listView = new ListView<>();

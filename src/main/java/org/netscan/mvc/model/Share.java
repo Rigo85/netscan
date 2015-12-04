@@ -2,6 +2,7 @@ package org.netscan.mvc.model;
 
 import javafx.beans.property.SimpleLongProperty;
 import javafx.concurrent.Task;
+import jcifs.smb.NtlmPasswordAuthentication;
 
 import java.time.LocalDate;
 
@@ -16,17 +17,19 @@ import java.time.LocalDate;
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Please refer to the
  * AGPL (http:www.gnu.org/licenses/agpl-3.0.txt) for more details.
  */
-public class Share extends Task<SimpleLongProperty>{
+public class Share extends Task<SimpleLongProperty> {
     private final String name;
     private final String smbPath;
     private final long size;
     private final LocalDate date;
+    private final NtlmPasswordAuthentication auth;
 
-    public Share(String name, String smbPath, long size, LocalDate date) {
+    public Share(String name, String smbPath, long size, LocalDate date, NtlmPasswordAuthentication auth) {
         this.name = name;
         this.smbPath = smbPath;
         this.size = size;
         this.date = date;
+        this.auth = auth;
     }
 
     @Override
@@ -48,5 +51,41 @@ public class Share extends Task<SimpleLongProperty>{
 
     public LocalDate getDate() {
         return date;
+    }
+
+    @Override
+    public String toString() {
+        return "Share{" +
+                "name='" + name + '\'' +
+                ", smbPath='" + smbPath + '\'' +
+                ", size=" + size +
+                ", date=" + date +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Share)) return false;
+
+        Share share = (Share) o;
+
+        return getSize() == share.getSize() &&
+                !(getName() != null ? !getName().equals(share.getName()) : share.getName() != null) &&
+                !(getSmbPath() != null ? !getSmbPath().equals(share.getSmbPath()) : share.getSmbPath() != null) &&
+                !(getDate() != null ? !getDate().equals(share.getDate()) : share.getDate() != null);
+    }
+
+    @Override
+    public int hashCode() {
+        int result = getName() != null ? getName().hashCode() : 0;
+        result = 31 * result + (getSmbPath() != null ? getSmbPath().hashCode() : 0);
+        result = 31 * result + (int) (getSize() ^ (getSize() >>> 32));
+        result = 31 * result + (getDate() != null ? getDate().hashCode() : 0);
+        return result;
+    }
+
+    public NtlmPasswordAuthentication getAuth() {
+        return auth;
     }
 }

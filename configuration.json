@@ -1,0 +1,550 @@
+{
+  "credentials": [
+    {
+      "credential": "*:administrador:administrador"
+    },
+    {
+      "credential": "*:administrador:admin"
+    },
+    {
+      "credential": "*:administrador:admin123"
+    },
+    {
+      "credential": "*:administrador:1"
+    },
+    {
+      "credential": "*:administrador:123"
+    },
+    {
+      "credential": "*:administrador:123456789"
+    },
+    {
+      "credential": "*:administrador:administrator"
+    },
+    {
+      "credential": "*:administrador:adminvideoweb"
+    },
+    {
+      "credential": "*:administrador:videoweb"
+    },
+    {
+      "credential": "*:administrador:lasperras"
+    },
+    {
+      "credential": "*:administrador:loslocos"
+    },
+    {
+      "credential": "*:administrador:lossalvajes"
+    },
+    {
+      "credential": "*:administrador:pinga"
+    },
+    {
+      "credential": "*:administrador:chicassexys"
+    },
+    {
+      "credential": "*:administrador:profesores"
+    },
+    {
+      "credential": "*:administrador:admin2010"
+    },
+    {
+      "credential": "*:administrador:admin09"
+    },
+    {
+      "credential": "*:administrador:admin2009"
+    },
+    {
+      "credential": "*:administrador:losmundialistas"
+    },
+    {
+      "credential": "*:administrador:ninguna"
+    },
+    {
+      "credential": "*:administrador:chicos"
+    },
+    {
+      "credential": "*:administrador:chicas"
+    },
+    {
+      "credential": "*:administrador:ninguna"
+    },
+    {
+      "credential": "*:administrador:vidanueva"
+    },
+    {
+      "credential": "*:administrador:casa"
+    },
+    {
+      "credential": "*:administrador:notengo"
+    },
+    {
+      "credential": "*:administrador:nuevocurso"
+    },
+    {
+      "credential": "*:administrador:qaz"
+    },
+    {
+      "credential": "*:administrador:chicaslocas"
+    },
+    {
+      "credential": "*:administrador:chikaslokas"
+    },
+    {
+      "credential": "*:administrador:lokasuci"
+    },
+    {
+      "credential": "*:administrador:lasnenas"
+    },
+    {
+      "credential": "*:administrador:qwe"
+    },
+    {
+      "credential": "*:administrador:Administrador"
+    },
+    {
+      "credential": "*:administrador:ADMINISTRADOR"
+    },
+    {
+      "credential": "*:administrador:ADMIN"
+    },
+    {
+      "credential": "*:administrador:ADMINISTRATOR"
+    },
+    {
+      "credential": "*:administrador:losrokers"
+    },
+    {
+      "credential": "*:administrador:miamor"
+    },
+    {
+      "credential": "*:administrador:killer"
+    },
+    {
+      "credential": "*:administrador:barcelona"
+    },
+    {
+      "credential": "*:administrador:windowsp"
+    },
+    {
+      "credential": "*:administrador:passw0rd"
+    },
+    {
+      "credential": "*:administrador:p@ssw0rd"
+    },
+    {
+      "credential": "*:administrador:password"
+    },
+    {
+      "credential": "*:administrador:realmadrid"
+    },
+    {
+      "credential": "*:administrador:chicas"
+    },
+    {
+      "credential": "*:administrador:chikas"
+    },
+    {
+      "credential": "*:administrador:chicos"
+    },
+    {
+      "credential": "*:administrador:chikos"
+    },
+    {
+      "credential": "*:administrador:proyecto"
+    },
+    {
+      "credential": "*:administrador:contrasenna"
+    },
+    {
+      "credential": "*:administrador:carlos"
+    },
+    {
+      "credential": "*:administrador:Admin"
+    },
+    {
+      "credential": "*:administrador:pass"
+    },
+    {
+      "credential": "*:administrador:CEIGE"
+    },
+    {
+      "credential": "*:administrador:mipc"
+    },
+    {
+      "credential": "*:administrador:pcproyecto"
+    },
+    {
+      "credential": "*:administrador:newpassword"
+    },
+    {
+      "credential": "*:administrador:nuevacontrasenna"
+    },
+    {
+      "credential": "*:administrador:calidad"
+    },
+    {
+      "credential": "*:administrador:recuerdame"
+    },
+    {
+      "credential": "*:administrador:1qazxsw2"
+    },
+    {
+      "credential": "*:administrador:entra"
+    },
+    {
+      "credential": "*:administrador:CEIGEL"
+    },
+    {
+      "credential": "*:administrador:qweasd"
+    },
+    {
+      "credential": "*:administrador:root"
+    },
+    {
+      "credential": "*:administrador:qazxsw"
+    },
+    {
+      "credential": "*:administrador:1qazxsw2"
+    },
+    {
+      "credential": "*:administrador:aptoapto"
+    },
+    {
+      "credential": "*:administrador:secretaria"
+    },
+    {
+      "credential": "*:administrador:semeolvido"
+    },
+    {
+      "credential": "*:administrator:administrator"
+    },
+    {
+      "credential": "*:administrator:admin"
+    },
+    {
+      "credential": "*:administrator:administrador"
+    },
+    {
+      "credential": "*:administrator:admin2009"
+    },
+    {
+      "credential": "*:administrator:admin2010"
+    },
+    {
+      "credential": "*:administrator:windowsp"
+    },
+    {
+      "credential": "*:administrator:password"
+    },
+    {
+      "credential": "*:administrator:chikas"
+    },
+    {
+      "credential": "*:administrator:chicas"
+    },
+    {
+      "credential": "*:administrator:pass"
+    },
+    {
+      "credential": "*:administrator:apartamento"
+    },
+    {
+      "credential": "*:administrator:apto"
+    },
+    {
+      "credential": "*:administrator:qazwsx"
+    },
+    {
+      "credential": "*:administrator:123"
+    },
+    {
+      "credential": "*:administrator:123456"
+    },
+    {
+      "credential": "*:administrator:1"
+    },
+    {
+      "credential": "*:administrator:123456789"
+    },
+    {
+      "credential": "*:administrator:qweasd"
+    },
+    {
+      "credential": "*:ADMINISTRATOR:ADMIN"
+    },
+    {
+      "credential": "*:administrator:ADMINISTRATOR"
+    },
+    {
+      "credential": "*:administrator:ADMINISTRADOR"
+    },
+    {
+      "credential": "*:administrator:1qazxsw2"
+    },
+    {
+      "credential": "*:administrator:aptoapto"
+    },
+    {
+      "credential": "*:administrator:semeolvido"
+    },
+    {
+      "credential": "*:administrator:profesores"
+    },
+    {
+      "credential": "*:admin:administrador"
+    },
+    {
+      "credential": "*:admin:admin"
+    },
+    {
+      "credential": "*:admin:administrator"
+    },
+    {
+      "credential": "*:admin:admin123"
+    },
+    {
+      "credential": "*:admin:123456789"
+    },
+    {
+      "credential": "*:admin:profesores"
+    },
+    {
+      "credential": "*:admin:1"
+    },
+    {
+      "credential": "*:admin:123"
+    },
+    {
+      "credential": "*:admin:guest"
+    },
+    {
+      "credential": "*:admin:passw0rd"
+    },
+    {
+      "credential": "*:admin:p@ssw0rd"
+    },
+    {
+      "credential": "*:admin:pass"
+    },
+    {
+      "credential": "*:admin:notengo"
+    },
+    {
+      "credential": "*:admin:admin2010"
+    },
+    {
+      "credential": "*:admin:administrador2010"
+    },
+    {
+      "credential": "*:admin:ADMIN"
+    },
+    {
+      "credential": "*:admin:ADMINISTRATOR"
+    },
+    {
+      "credential": "*:admin:ADMINISTRADOR"
+    },
+    {
+      "credential": "*:admin:gay"
+    },
+    {
+      "credential": "*:admin:apto"
+    },
+    {
+      "credential": "*:guest:guest"
+    },
+    {
+      "credential": "*:tecnico:tecnico"
+    },
+    {
+      "credential": "*:invitado:invitado"
+    },
+    {
+      "credential": "*:copia:copia"
+    },
+    {
+      "credential": "*:copiar:copiar"
+    },
+    {
+      "credential": "*:postgres:postgres"
+    },
+    {
+      "credential": "*:docencia:docencia"
+    },
+    {
+      "credential": "*:tecnico:P@ssw0rd*.admin"
+    },
+    {
+      "credential": "*:yucelia:yuceliami"
+    },
+    {
+      "credential": "*:calidad:calidad"
+    },
+    {
+      "credential": "*:calidad:proyecto"
+    },
+    {
+      "credential": "*:apto:123"
+    },
+    {
+      "credential": "*:apto:123456"
+    },
+    {
+      "credential": "*:apto:1"
+    },
+    {
+      "credential": "*:apto:123456789"
+    },
+    {
+      "credential": "*:apto:lokoslokos"
+    },
+    {
+      "credential": "*:apto:123456789"
+    },
+    {
+      "credential": "*:apto:aptoapto"
+    },
+    {
+      "credential": "*:apto:profesores"
+    },
+    {
+      "credential": "*:sigep:sigeppruebas"
+    },
+    {
+      "credential": "*:banco:ale"
+    },
+    {
+      "credential": "*:banco:banco"
+    },
+    {
+      "credential": "*:pepe:pepe"
+    },
+    {
+      "credential": "*:root:pepe"
+    },
+    {
+      "credential": "*:root:rootadmin"
+    },
+    {
+      "credential": "*:ubuntu:1234567"
+    },
+    {
+      "credential": "*:root:nova*.admin"
+    },
+    {
+      "credential": "*:ubuntu:linuxadmin"
+    },
+    {
+      "credential": "*:ubuntu:ubuntu"
+    },
+    {
+      "credential": "*:chikas:chikaslokas"
+    },
+    {
+      "credential": "*:chicas:chicaslocas"
+    },
+    {
+      "credential": "*:chicas:locas.uci"
+    },
+    {
+      "credential": "*:chicas:lokas.uci"
+    },
+    {
+      "credential": "*:chicas:locas"
+    },
+    {
+      "credential": "*:chicas:lokas"
+    },
+    {
+      "credential": "*:chicas:chicas"
+    },
+    {
+      "credential": "*:chikas:chikas"
+    },
+    {
+      "credential": "*:chicos:123456789"
+    },
+    {
+      "credential": "*:chicos:123"
+    },
+    {
+      "credential": "*:chicos:1"
+    },
+    {
+      "credential": "*:chicos:chicos"
+    },
+    {
+      "credential": "*:chicas:123456789"
+    },
+    {
+      "credential": "*:chicas:123"
+    },
+    {
+      "credential": "*:chicas:1"
+    },
+    {
+      "credential": "*:profesores:profes"
+    },
+    {
+      "credential": "*:pc:pcmia"
+    },
+    {
+      "credential": "*:servidor:servidor"
+    },
+    {
+      "credential": "*:secretaria:secretaria"
+    },
+    {
+      "credential": "*:profes:profes"
+    },
+    {
+      "credential": "*:server:server"
+    },
+    {
+      "credential": "*:profesor:profesor"
+    },
+    {
+      "credential": "*:apto:administrador"
+    },
+    {
+      "credential": "*:chicas:chicaschicas"
+    },
+    {
+      "credential": "*:petrosoft:petrosoft"
+    },
+    {
+      "credential": "*:produccion:produccion"
+    },
+    {
+      "credential": "*:sirecc:sirecc"
+    },
+    {
+      "credential": "*:apto14109:apto14109.."
+    },
+    {
+      "credential": "*:sirecc:sireccsirecc"
+    }
+  ],
+  "ranges": [
+    {
+      "beginIP": {
+        "ip": "10.8.14.19"
+      },
+      "endIP": {
+        "ip": "10.8.14.80"
+      }
+    }
+  ],
+  "filters": [
+    {
+      "filter": "*.webm, *.mkv, *.flv, *.flv, *.vob, *.ogv, *.ogg, *.drc, *.gif, *.gifv, *.mng, *.avi, *.mov, *.qt, *.wmv, *.yuv, *.rm, *.rmvb, *.asf, *.mp4, *.m4p, *.m4v, *.mpg, *.mp2, *.mpeg, *.mpe, *.mpv, *.mpg, *.mpeg, *.m2v, *.m4v, *.svi, *.3gp, *.3g2, *.mxf, *.roq, *.nsv, *.flv, *.f4v, *.f4p, *.f4a, *.f4b, *.swf, *.mpg4, *.mpeg4, *.dat, *.DAT"
+    },
+    {
+      "filter": "*.*"
+    }
+  ],
+  "threads": 20,
+  "timeout": 200,
+  "queuesize": 10
+}
