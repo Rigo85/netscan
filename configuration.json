@@ -520,19 +520,16 @@
       "credential": "*:sirecc:sirecc"
     },
     {
-      "credential": "*:apto14109:apto14109.."
-    },
-    {
       "credential": "*:sirecc:sireccsirecc"
     }
   ],
   "ranges": [
     {
       "beginIP": {
-        "ip": "10.8.14.19"
+        "ip": "10.8.1.1"
       },
       "endIP": {
-        "ip": "10.8.14.80"
+        "ip": "10.8.158.255"
       }
     }
   ],

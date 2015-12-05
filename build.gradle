@@ -46,12 +46,12 @@ task run(type: JavaExec) {
     main = "org.netscan.mvc.NetScanApp"
     classpath = sourceSets.main.runtimeClasspath
 }
-/*
+
 task fatJar(type: Jar) {
     manifest {
-        attributes 'Implementation-Title': 'CIFSSynchronizer',
+        attributes 'Implementation-Title': 'NetScan',
                 'Implementation-Version': version,
-                'Main-Class': 'org.cifssynchronizer.mvc.CIFSSynchronizerApp'
+                'Main-Class': 'org.netscan.mvc.NetScanApp'
     }
     baseName = project.name + '-all'
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }{
@@ -61,4 +61,3 @@ task fatJar(type: Jar) {
     }
     with jar
 }
-* */

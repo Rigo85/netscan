@@ -40,10 +40,10 @@ import java.util.Optional;
  * AGPL (http:www.gnu.org/licenses/agpl-3.0.txt) for more details.
  */
 public class NetScanPresenter {
-    private final NetScanView netScanView;
-    private final Configuration conf;
     final SettingsView settingsView;
     final SearchService searchService;
+    private final NetScanView netScanView;
+    private final Configuration conf;
     private final ObservableList<Share> list;
 
     public NetScanPresenter(NetScanView netScanView) {
@@ -110,7 +110,11 @@ public class NetScanPresenter {
             }
         });
 
-        netScanView.openFileManager.setOnAction(e -> openFileManagerAction());
+        if (System.getProperty("os.name").contains("Windows")) {
+            netScanView.openFileManager.setDisable(true);
+        } else {
+            netScanView.openFileManager.setOnAction(e -> openFileManagerAction());
+        }
 
         netScanView.credentials.setOnAction(e -> credentialsAction());
     }
@@ -165,16 +169,15 @@ public class NetScanPresenter {
         }
     }
 
-    //fixme improve.
     private void openFileManagerAction() {
         final Share share = netScanView.tableView.getSelectionModel().getSelectedItem();
 
         if (share != null) {
-            String comm = String
-                    .format("%s %s", System.getProperty("os.name").contains("Windows") ? "explorer" : "xdg-open",
-                            Paths.get(share.getSmbPath()).getParent().toString().replace("smb:/", "smb://"));
+            String path= Paths.get(share.getSmbPath()).getParent().toString().replace("smb:/", "smb://");
+            String fManager= "xdg-open";
+            String comm = String.format("%s %s", fManager, path);
+
             try {
-                System.out.println(comm);
                 Runtime.getRuntime().exec(comm);
             } catch (IOException ignored) {
             }
