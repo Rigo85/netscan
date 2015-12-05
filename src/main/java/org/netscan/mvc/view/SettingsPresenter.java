@@ -242,11 +242,17 @@ public class SettingsPresenter {
         addButton.setDisable(true);
 
         text1.textProperty().addListener((observable, oldValue, newValue) -> {
-            addButton.setDisable(!IPAddressUtil.isIPv4LiteralAddress(newValue) || !IPAddressUtil.isIPv4LiteralAddress(text2.getText()));
+            addButton.setDisable(!IPAddressUtil.isIPv4LiteralAddress(newValue) ||
+                    !IPAddressUtil.isIPv4LiteralAddress(text2.getText()) ||
+                    new IPv4(newValue).toLong() > new IPv4(text2.getText()).toLong()
+            );
         });
 
         text2.textProperty().addListener((observable, oldValue, newValue) -> {
-            addButton.setDisable(!IPAddressUtil.isIPv4LiteralAddress(newValue) || !IPAddressUtil.isIPv4LiteralAddress(text1.getText()));
+            addButton.setDisable(!IPAddressUtil.isIPv4LiteralAddress(newValue) ||
+                    !IPAddressUtil.isIPv4LiteralAddress(text1.getText()) ||
+                    new IPv4(newValue).toLong() < new IPv4(text1.getText()).toLong()
+            );
         });
 
         dialog.setResultConverter(b -> {

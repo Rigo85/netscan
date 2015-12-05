@@ -42,6 +42,7 @@ public class NetScanView extends BorderPane {
     ContextMenu contextMenu;
     MenuItem openFileManager;
     MenuItem credentials;
+    ProgressBar progressBar;
 
     public NetScanView() {
         createMenu();
@@ -63,6 +64,12 @@ public class NetScanView extends BorderPane {
         tableView.getColumns().add(getLastModificationColumn());
         tableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         tableView.setContextMenu(contextMenu);
+
+        progressBar = new ProgressBar();
+        progressBar.setPrefWidth(250);
+        VBox bottomPanel = new VBox(progressBar);
+        VBox.setMargin(progressBar, new Insets(0, 8, 8, 8));
+        setBottom(bottomPanel);
 
         centerPanel = new VBox(toolBar, tableView);
         VBox.setMargin(toolBar, new Insets(8, 8, 8, 8));

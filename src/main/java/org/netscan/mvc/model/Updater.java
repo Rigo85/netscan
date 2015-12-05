@@ -35,6 +35,7 @@ public class Updater implements Runnable, Consumer<List<SmbFile>> {
 
     @Override
     synchronized public void accept(List<SmbFile> smbFiles) {
+        searchTask.updateProgress();
         if (!smbFiles.isEmpty()) {
             queue.add(smbFiles);
             try {

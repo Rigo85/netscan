@@ -117,6 +117,8 @@ public class NetScanPresenter {
         }
 
         netScanView.credentials.setOnAction(e -> credentialsAction());
+
+        netScanView.progressBar.progressProperty().bind(searchService.progressProperty());
     }
 
     private void credentialsAction() {

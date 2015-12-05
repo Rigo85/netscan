@@ -45,6 +45,10 @@ public class Range {
         this.endIP = endIP;
     }
 
+    public long ipCount() {
+        return endIP.toLong() - beginIP.toLong();
+    }
+
     @Override
     public String toString() {
         return String.format("%s - %s", beginIP, endIP);

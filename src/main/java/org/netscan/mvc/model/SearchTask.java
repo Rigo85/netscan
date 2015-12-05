@@ -4,6 +4,7 @@ import javafx.concurrent.Task;
 import jcifs.smb.SmbFile;
 import org.netscan.core.configuration.Configuration;
 import org.netscan.core.configuration.Filter;
+import org.netscan.core.configuration.Range;
 import org.netscan.core.ipv4.IPv4;
 import org.netscan.core.ipv4.IPv4Producer;
 import org.netscan.core.ipv4.IPv4Supplier;
@@ -14,6 +15,7 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 /**
@@ -32,12 +34,20 @@ public class SearchTask extends Task<List<SmbFile>> {
     private final Configuration conf;
     private final Filter filter;
     private final BlockingQueue<CountDownLatch> continueQueue;
+    private final long ipCount;
+    private long workDone;
 
     public SearchTask(Configuration conf, Filter filter, BlockingQueue<CountDownLatch> continueQueue) {
         this.conf = conf;
         this.filter = filter;
         queue = new ArrayBlockingQueue<>(conf.getQueueSize());
         this.continueQueue = continueQueue;
+        ipCount = IPCount();
+        workDone = 0L;
+    }
+
+    private long IPCount() {
+        return conf.getRanges().stream().collect(Collectors.summarizingLong(Range::ipCount)).getSum();
     }
 
     @Override
@@ -76,5 +86,9 @@ public class SearchTask extends Task<List<SmbFile>> {
 
     public void update(List<SmbFile> smbFiles) {
         updateValue(smbFiles);
+    }
+
+    public void updateProgress() {
+        updateProgress(++workDone, ipCount);
     }
 }
