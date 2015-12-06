@@ -21,7 +21,6 @@ import org.netscan.core.configuration.Filter;
 import org.netscan.mvc.model.SearchService;
 import org.netscan.mvc.model.Share;
 
-import java.io.IOException;
 import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.util.Date;
@@ -182,10 +181,15 @@ public class NetScanPresenter {
             String fManager = "xdg-open";
             String comm = String.format("%s %s", fManager, path);
 
-            try {
-                Runtime.getRuntime().exec(comm);
-            } catch (IOException ignored) {
-            }
+            Platform.runLater(() -> {
+                try {
+                    Process process = Runtime.getRuntime().exec(comm);
+                    while (process.exitValue() != 0) {
+                        process = Runtime.getRuntime().exec(comm);
+                    }
+                } catch (Exception ignored) {
+                }
+            });
         }
     }
 
