@@ -99,6 +99,9 @@ public class NetScanPresenter {
         netScanView.searchButton.setOnAction(e -> searchEvent());
         netScanView.searchButton.disableProperty().bind(searchService.stateProperty().isEqualTo(Worker.State.RUNNING));
 
+        netScanView.stopButton.setOnAction(e -> searchService.cancel());
+        netScanView.stopButton.disableProperty().bind(searchService.stateProperty().isNotEqualTo(Worker.State.RUNNING));
+
         netScanView.searchTextField.disableProperty().bind(searchService.stateProperty().isEqualTo(Worker.State.RUNNING));
         netScanView.searchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isEmpty()) {
@@ -175,8 +178,8 @@ public class NetScanPresenter {
         final Share share = netScanView.tableView.getSelectionModel().getSelectedItem();
 
         if (share != null) {
-            String path= Paths.get(share.getSmbPath()).getParent().toString().replace("smb:/", "smb://");
-            String fManager= "xdg-open";
+            String path = Paths.get(share.getSmbPath()).getParent().toString().replace("smb:/", "smb://");
+            String fManager = "xdg-open";
             String comm = String.format("%s %s", fManager, path);
 
             try {
@@ -215,8 +218,14 @@ public class NetScanPresenter {
 
             searchService.setFilter(filter);
             searchService.setOnSucceeded(e -> onSuccessSearch());
+            searchService.setOnCancelled(e -> onCancelSearch());
             searchService.start();
         }
+    }
+
+    private void onCancelSearch() {
+        list.clear();
+        list.addAll(netScanView.tableView.getItems());
     }
 
     private void onSuccessSearch() {

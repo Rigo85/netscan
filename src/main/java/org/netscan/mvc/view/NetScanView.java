@@ -36,6 +36,7 @@ public class NetScanView extends BorderPane {
     Label filterLabel;
     ComboBox<Filter> filterComboBox;
     Button searchButton;
+    Button stopButton;
     TableView<Share> tableView;
     VBox centerPanel;
     TextField searchTextField;
@@ -97,7 +98,10 @@ public class NetScanView extends BorderPane {
         searchButton = new Button(null, new ImageView(new Image(
                 getClass().getClassLoader().getResource("images/search.png").toExternalForm())));
 
-        toolBar = new HBox(8, filterLabel, filterComboBox, searchButton, expander1, searchLabel, searchTextField);
+        stopButton = new Button(null, new ImageView(new Image(
+                getClass().getClassLoader().getResource("images/stop.png").toExternalForm())));
+
+        toolBar = new HBox(8, filterLabel, filterComboBox, searchButton, stopButton, expander1, searchLabel, searchTextField);
 
         HBox.setMargin(filterLabel, new Insets(5, 0, 5, 0));
     }

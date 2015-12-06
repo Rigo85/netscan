@@ -6,7 +6,6 @@ import org.netscan.core.configuration.Configuration;
 import org.netscan.core.configuration.Filter;
 import org.netscan.core.configuration.Range;
 import org.netscan.core.ipv4.IPv4;
-import org.netscan.core.ipv4.IPv4Producer;
 import org.netscan.core.ipv4.IPv4Supplier;
 import org.netscan.core.workers.Worker;
 
@@ -15,8 +14,13 @@ import java.util.List;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static org.netscan.core.ipv4.IPv4Supplier.END_IP;
+import static org.netscan.core.ipv4.IPv4Supplier.END_THREAD;
 
 /**
  * Author Rigoberto Leander Salgado Reyes <rlsalgado2006@gmail.com>
@@ -34,16 +38,18 @@ public class SearchTask extends Task<List<SmbFile>> {
     private final Configuration conf;
     private final Filter filter;
     private final BlockingQueue<CountDownLatch> continueQueue;
-    private final long ipCount;
-    private long workDone;
+    private final AtomicBoolean stopProducer;
+    private final AtomicLong workDone;
+    private final AtomicLong totalToProcess;
 
     public SearchTask(Configuration conf, Filter filter, BlockingQueue<CountDownLatch> continueQueue) {
         this.conf = conf;
         this.filter = filter;
         queue = new ArrayBlockingQueue<>(conf.getQueueSize());
         this.continueQueue = continueQueue;
-        ipCount = IPCount();
-        workDone = 0L;
+        workDone = new AtomicLong(0L);
+        stopProducer = new AtomicBoolean(false);
+        totalToProcess = new AtomicLong(IPCount());
     }
 
     private long IPCount() {
@@ -79,8 +85,28 @@ public class SearchTask extends Task<List<SmbFile>> {
     }
 
     private void startProducer() {
+        final IPv4Supplier supplier = new IPv4Supplier(conf);
+
         new Thread(() -> {
-            new IPv4Producer<>(queue).produce(new IPv4Supplier(conf));
+            IPv4 ip = supplier.get();
+            while (ip != END_IP && !stopProducer.get()) {
+                try {
+                    queue.put(ip);
+                } catch (InterruptedException e) {
+                    throw new RuntimeException(e);
+                }
+                ip = supplier.get();
+            }
+
+            if (stopProducer.get()) {
+                queue.clear();
+                IntStream.range(0, conf.getThreads()).forEach(value -> {
+                    try {
+                        queue.put(END_THREAD);
+                    } catch (InterruptedException ignored) {
+                    }
+                });
+            }
         }).start();
     }
 
@@ -89,6 +115,12 @@ public class SearchTask extends Task<List<SmbFile>> {
     }
 
     public void updateProgress() {
-        updateProgress(++workDone, ipCount);
+        updateProgress(workDone.incrementAndGet(), totalToProcess.get());
+    }
+
+    @Override
+    public boolean cancel(boolean mayInterruptIfRunning) {
+        stopProducer.set(true);
+        return super.cancel(mayInterruptIfRunning);
     }
 }
