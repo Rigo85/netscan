@@ -535,13 +535,16 @@
   ],
   "filters": [
     {
-      "filter": "*.webm, *.mkv, *.flv, *.flv, *.vob, *.ogv, *.ogg, *.drc, *.gif, *.gifv, *.mng, *.avi, *.mov, *.qt, *.wmv, *.yuv, *.rm, *.rmvb, *.asf, *.mp4, *.m4p, *.m4v, *.mpg, *.mp2, *.mpeg, *.mpe, *.mpv, *.mpg, *.mpeg, *.m2v, *.m4v, *.svi, *.3gp, *.3g2, *.mxf, *.roq, *.nsv, *.flv, *.f4v, *.f4p, *.f4a, *.f4b, *.swf, *.mpg4, *.mpeg4, *.dat, *.DAT"
+      "filter": "*.webm, *.mkv, *.flv, *.flv, *.vob, *.ogv, *.ogg, *.drc, *.gif, *.gifv\n*.mng, *.avi, *.mov, *.qt, *.wmv, *.yuv, *.rm, *.rmvb, *.asf, *.mp4\n*.m4p, *.m4v, *.mpg, *.mp2, *.mpeg, *.mpe, *.mpv, *.mpg, *.mpeg, *.m2v\n*.m4v, *.svi, *.3gp, *.3g2, *.mxf, *.roq, *.nsv, *.flv, *.f4v, *.f4p\n*.f4a, *.f4b, *.swf, *.mpg4, *.mpeg4, *.dat, *.DAT"
     },
     {
       "filter": "*.*"
+    },
+    {
+      "filter": "*.avi, *.mpg, *.mpeg, *.mkv"
     }
   ],
-  "threads": 20,
+  "threads": 30,
   "timeout": 200,
   "queuesize": 10
 }
