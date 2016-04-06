@@ -19,13 +19,12 @@ import javafx.scene.layout.VBox;
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Please refer to the
  * AGPL (http:www.gnu.org/licenses/agpl-3.0.txt) for more details.
  */
-public class GenericView extends BorderPane {
+class GenericView extends BorderPane {
     final ListView listView;
-    final VBox buttonBar;
     final Button addButton;
     final Button removeButton;
 
-    public GenericView(String title) {
+    GenericView(String title) {
         listView = new ListView<>();
         listView.setMaxHeight(100);
         listView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
@@ -38,7 +37,7 @@ public class GenericView extends BorderPane {
         removeButton.setMaxWidth(Double.MAX_VALUE);
         VBox.setMargin(removeButton, new Insets(0, 0, 8, 8));
 
-        buttonBar = new VBox(5, addButton, removeButton);
+        VBox buttonBar = new VBox(5, addButton, removeButton);
 
         setTop(new Label(title));
 

@@ -21,8 +21,8 @@ public class IPv4Supplier implements Supplier<IPv4> {
 
     public static IPv4 END_THREAD = new IPv4("0.0.0.0");
     public static IPv4 END_IP = new IPv4("0.0.0.0");
-    final Iterator<Range> rangeIt;
-    int countDown;
+    private final Iterator<Range> rangeIt;
+    private int countDown;
     private Range range = null;
     private IPv4 ip = null;
 

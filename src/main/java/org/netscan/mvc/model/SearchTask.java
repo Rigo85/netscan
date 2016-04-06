@@ -33,7 +33,7 @@ import static org.netscan.core.ipv4.IPv4Supplier.END_THREAD;
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Please refer to the
  * AGPL (http:www.gnu.org/licenses/agpl-3.0.txt) for more details.
  */
-public class SearchTask extends Task<List<SmbFile>> {
+class SearchTask extends Task<List<SmbFile>> {
     private final BlockingQueue<IPv4> queue;
     private final Configuration conf;
     private final Filter filter;
@@ -42,7 +42,7 @@ public class SearchTask extends Task<List<SmbFile>> {
     private final AtomicLong workDone;
     private final AtomicLong totalToProcess;
 
-    public SearchTask(Configuration conf, Filter filter, BlockingQueue<CountDownLatch> continueQueue) {
+    SearchTask(Configuration conf, Filter filter, BlockingQueue<CountDownLatch> continueQueue) {
         this.conf = conf;
         this.filter = filter;
         queue = new ArrayBlockingQueue<>(conf.getQueueSize());
@@ -110,11 +110,11 @@ public class SearchTask extends Task<List<SmbFile>> {
         }).start();
     }
 
-    public void update(List<SmbFile> smbFiles) {
+    void update(List<SmbFile> smbFiles) {
         updateValue(smbFiles);
     }
 
-    public void updateProgress() {
+    void updateProgress() {
         updateProgress(workDone.incrementAndGet(), totalToProcess.get());
     }
 

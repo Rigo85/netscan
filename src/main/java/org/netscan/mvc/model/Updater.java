@@ -19,14 +19,14 @@ import java.util.function.Consumer;
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Please refer to the
  * AGPL (http:www.gnu.org/licenses/agpl-3.0.txt) for more details.
  */
-public class Updater implements Runnable, Consumer<List<SmbFile>> {
+class Updater implements Runnable, Consumer<List<SmbFile>> {
 
     private final BlockingQueue<CountDownLatch> continueQueue;
     private final SearchTask searchTask;
-    final BlockingQueue<List<SmbFile>> queue;
+    private final BlockingQueue<List<SmbFile>> queue;
     private boolean stop;
 
-    public Updater(BlockingQueue<CountDownLatch> continueQueue, SearchTask searchTask) {
+    Updater(BlockingQueue<CountDownLatch> continueQueue, SearchTask searchTask) {
         this.continueQueue = continueQueue;
         this.searchTask = searchTask;
         queue = new LinkedBlockingQueue<>();
@@ -64,7 +64,7 @@ public class Updater implements Runnable, Consumer<List<SmbFile>> {
         }
     }
 
-    public void stop() {
+    void stop() {
         stop = true;
     }
 }

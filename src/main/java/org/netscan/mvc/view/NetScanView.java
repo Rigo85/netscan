@@ -26,24 +26,20 @@ import java.time.LocalDate;
  * AGPL (http:www.gnu.org/licenses/agpl-3.0.txt) for more details.
  */
 public class NetScanView extends BorderPane {
-    MenuBar menuBar;
-    Menu file;
     MenuItem settings;
     MenuItem exit;
-    Menu help;
     MenuItem about;
-    HBox toolBar;
-    Label filterLabel;
     ComboBox<Filter> filterComboBox;
     Button searchButton;
     Button stopButton;
     TableView<Share> tableView;
-    VBox centerPanel;
     TextField searchTextField;
-    ContextMenu contextMenu;
     MenuItem openFileManager;
     MenuItem credentials;
     ProgressBar progressBar;
+    private MenuBar menuBar;
+    private HBox toolBar;
+    private VBox centerPanel;
 
     public NetScanView() {
         createMenu();
@@ -56,7 +52,7 @@ public class NetScanView extends BorderPane {
     private void createCenterPanel() {
         openFileManager = new MenuItem("Open File Manager");
         credentials = new MenuItem("Credentials");
-        contextMenu = new ContextMenu(openFileManager, credentials);
+        ContextMenu contextMenu = new ContextMenu(openFileManager, credentials);
 
         tableView = new TableView<>();
         tableView.getColumns().add(getNameColumn());
@@ -79,7 +75,7 @@ public class NetScanView extends BorderPane {
     }
 
     private void createToolbar() {
-        filterLabel = new Label("Search files");
+        Label filterLabel = new Label("Search files");
 
         filterComboBox = new ComboBox<>();
         filterComboBox.setPrefWidth(500);
@@ -109,10 +105,10 @@ public class NetScanView extends BorderPane {
     private void createMenu() {
         settings = new MenuItem("Settings");
         exit = new MenuItem("Exit");
-        file = new Menu("File", null, settings, new SeparatorMenuItem(), exit);
+        Menu file = new Menu("File", null, settings, new SeparatorMenuItem(), exit);
 
         about = new MenuItem("About");
-        help = new Menu("?", null, about);
+        Menu help = new Menu("?", null, about);
 
         menuBar = new MenuBar(file, help);
     }

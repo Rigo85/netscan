@@ -21,7 +21,7 @@ public class IPAddressUtil {
     public IPAddressUtil() {
     }
 
-    public static List<Short> textToNumericFormatV4(String var0) {
+    static List<Short> textToNumericFormatV4(String var0) {
         List<Short> result;
 
         try {

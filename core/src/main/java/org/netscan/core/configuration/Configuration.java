@@ -17,25 +17,20 @@ import java.util.List;
  * AGPL (http:www.gnu.org/licenses/agpl-3.0.txt) for more details.
  */
 public class Configuration {
-    @SerializedName("credentials")
-    List<Credential> credentials;
-
-    @SerializedName("ranges")
-    List<Range> ranges;
-
-    @SerializedName("filters")
-    List<Filter> filters;
-
     @SerializedName("threads")
-    int threads;
-
+    private int threads;
     @SerializedName("timeout")
-    int timeOut;
-
+    private int timeOut;
     @SerializedName("queuesize")
-    int queueSize;
+    private int queueSize;
+    @SerializedName("credentials")
+    private List<Credential> credentials;
+    @SerializedName("ranges")
+    private List<Range> ranges;
+    @SerializedName("filters")
+    private List<Filter> filters;
 
-    public Configuration() {
+    Configuration() {
         credentials = Collections.emptyList();
         ranges = Collections.emptyList();
         filters = Collections.emptyList();
@@ -90,11 +85,11 @@ public class Configuration {
         this.queueSize = queueSize < 10 ? 10 : queueSize;
     }
 
-    public void addRange(Range range){
+    public void addRange(Range range) {
         ranges.add(range);
     }
 
-    public void removeRange(Range range){
+    public void removeRange(Range range) {
         ranges.remove(range);
     }
 
@@ -110,7 +105,7 @@ public class Configuration {
         filters.add(filter);
     }
 
-    public void removeFilter(Filter filter){
+    public void removeFilter(Filter filter) {
         filters.remove(filter);
     }
 }

@@ -14,13 +14,13 @@ import javafx.scene.layout.VBox;
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Please refer to the
  * AGPL (http:www.gnu.org/licenses/agpl-3.0.txt) for more details.
  */
-public class SettingsView extends VBox {
+class SettingsView extends VBox {
     final ThreadsView threadsView;
     final GenericView rangesView;
     final GenericView credentialsView;
     final GenericView filtersView;
 
-    public SettingsView() {
+    SettingsView() {
         threadsView = new ThreadsView(50);
 
         rangesView = new GenericView("Ranges");

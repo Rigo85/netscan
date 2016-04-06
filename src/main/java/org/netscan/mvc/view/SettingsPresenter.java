@@ -21,11 +21,11 @@ import org.netscan.core.ipv4.IPv4;
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Please refer to the
  * AGPL (http:www.gnu.org/licenses/agpl-3.0.txt) for more details.
  */
-public class SettingsPresenter {
+class SettingsPresenter {
     private final SettingsView settingsView;
     private final Configuration conf;
 
-    public SettingsPresenter(SettingsView settingsView, Configuration conf) {
+    SettingsPresenter(SettingsView settingsView, Configuration conf) {
         this.settingsView = settingsView;
         this.conf = conf;
 

@@ -16,12 +16,11 @@ import javafx.scene.layout.GridPane;
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Please refer to the
  * AGPL (http:www.gnu.org/licenses/agpl-3.0.txt) for more details.
  */
-public class ThreadsView extends GridPane {
-    final Label threadCountLabel;
+class ThreadsView extends GridPane {
     final Spinner<Integer> threadCount;
 
-    public ThreadsView(int max) {
-        threadCountLabel = new Label("Max. threads");
+    ThreadsView(int max) {
+        Label threadCountLabel = new Label("Max. threads");
         threadCount = new Spinner<>(1, max, 1);
         threadCount.setPrefWidth(60);
 
