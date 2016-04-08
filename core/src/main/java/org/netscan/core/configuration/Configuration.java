@@ -19,14 +19,19 @@ import java.util.List;
 public class Configuration {
     @SerializedName("threads")
     private int threads;
+
     @SerializedName("timeout")
     private int timeOut;
+
     @SerializedName("queuesize")
     private int queueSize;
+
     @SerializedName("credentials")
     private List<Credential> credentials;
+
     @SerializedName("ranges")
     private List<Range> ranges;
+
     @SerializedName("filters")
     private List<Filter> filters;
 

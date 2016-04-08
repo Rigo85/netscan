@@ -29,24 +29,12 @@ public class Range {
         this.endIP = endIP;
     }
 
-    public IPv4 getBeginIP() {
-        return beginIP;
-    }
-
     public void setBeginIP(IPv4 beginIP) {
         this.beginIP = beginIP;
     }
 
-    public IPv4 getEndIP() {
-        return endIP;
-    }
-
     public void setEndIP(IPv4 endIP) {
         this.endIP = endIP;
-    }
-
-    public long ipCount() {
-        return endIP.toLong() - beginIP.toLong();
     }
 
     @Override
@@ -61,15 +49,14 @@ public class Range {
 
         Range range = (Range) o;
 
-        return !(getBeginIP() != null ? !getBeginIP().equals(range.getBeginIP()) : range.getBeginIP() != null) &&
-                !(getEndIP() != null ? !getEndIP().equals(range.getEndIP()) : range.getEndIP() != null);
-
+        return beginIP != null ? beginIP.equals(range.beginIP) : range.beginIP == null &&
+                (endIP != null ? endIP.equals(range.endIP) : range.endIP == null);
     }
 
     @Override
     public int hashCode() {
-        int result = getBeginIP() != null ? getBeginIP().hashCode() : 0;
-        result = 31 * result + (getEndIP() != null ? getEndIP().hashCode() : 0);
+        int result = beginIP != null ? beginIP.hashCode() : 0;
+        result = 31 * result + (endIP != null ? endIP.hashCode() : 0);
         return result;
     }
 }

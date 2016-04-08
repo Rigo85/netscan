@@ -17,10 +17,6 @@ import java.util.stream.Stream;
  * AGPL (http:www.gnu.org/licenses/agpl-3.0.txt) for more details.
  */
 public class IPAddressUtil {
-
-    public IPAddressUtil() {
-    }
-
     static List<Short> textToNumericFormatV4(String var0) {
         List<Short> result;
 
@@ -33,8 +29,7 @@ public class IPAddressUtil {
         return result;
     }
 
-    public static boolean isIPv4LiteralAddress(String var0) {
-        return var0.matches("(([1-9]|[1-9]\\d|[1]\\d\\d|[2][0-4]\\d|[2][5][0-5]|0).){3}([1-9]|[1-9]\\d|[1]\\d\\d|[2][0-4]\\d|[2][5][0-5]|0)");
+    public static boolean isNotIPv4LiteralAddress(String var0) {
+        return !var0.matches("(([1-9]|[1-9]\\d|[1]\\d\\d|[2][0-4]\\d|[2][5][0-5]|0).){3}([1-9]|[1-9]\\d|[1]\\d\\d|[2][0-4]\\d|[2][5][0-5]|0)");
     }
-
 }

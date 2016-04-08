@@ -37,7 +37,7 @@ public class Share extends Task<SimpleLongProperty> {
         return null;
     }
 
-    private String getName() {
+    public String getName() {
         return name;
     }
 
@@ -45,11 +45,11 @@ public class Share extends Task<SimpleLongProperty> {
         return smbPath;
     }
 
-    private long getSize() {
+    public long getSize() {
         return size;
     }
 
-    private LocalDate getDate() {
+    public LocalDate getDate() {
         return date;
     }
 

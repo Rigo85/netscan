@@ -37,6 +37,7 @@ public class NetScanView extends BorderPane {
     MenuItem openFileManager;
     MenuItem credentials;
     ProgressBar progressBar;
+    Label labelProgressBar;
     private MenuBar menuBar;
     private HBox toolBar;
     private VBox centerPanel;
@@ -64,8 +65,10 @@ public class NetScanView extends BorderPane {
 
         progressBar = new ProgressBar();
         progressBar.setPrefWidth(250);
-        VBox bottomPanel = new VBox(progressBar);
-        VBox.setMargin(progressBar, new Insets(0, 8, 8, 8));
+        labelProgressBar = new Label();
+        HBox bottomPanel = new HBox(progressBar, labelProgressBar);
+        HBox.setMargin(progressBar, new Insets(0, 8, 8, 8));
+        HBox.setMargin(labelProgressBar, new Insets(0, 8, 8, 0));
         setBottom(bottomPanel);
 
         centerPanel = new VBox(toolBar, tableView);
@@ -85,7 +88,8 @@ public class NetScanView extends BorderPane {
         HBox.setHgrow(expander1, Priority.ALWAYS);
 
         Label searchLabel = new Label();
-        searchLabel.setGraphic(new ImageView(new Image(getClass().getClassLoader().getResource("images/filter.png").toExternalForm())));
+        searchLabel.setGraphic(new ImageView(new Image(
+                getClass().getClassLoader().getResource("images/filter.png").toExternalForm())));
 
         searchTextField = new TextField();
         searchTextField.setPromptText("Search file");
@@ -97,7 +101,8 @@ public class NetScanView extends BorderPane {
         stopButton = new Button(null, new ImageView(new Image(
                 getClass().getClassLoader().getResource("images/stop.png").toExternalForm())));
 
-        toolBar = new HBox(8, filterLabel, filterComboBox, searchButton, stopButton, expander1, searchLabel, searchTextField);
+        toolBar = new HBox(8, filterLabel, filterComboBox, searchButton, stopButton, expander1,
+                searchLabel, searchTextField);
 
         HBox.setMargin(filterLabel, new Insets(5, 0, 5, 0));
     }

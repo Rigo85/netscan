@@ -63,7 +63,7 @@ public class IPv4 {
      * y = (y + (z + (inc + w) / 255) / 255) % 255;
      * x = (x + (y + (z + (inc + w) / 255) / 255) / 255) % 255;
      */
-    public IPv4 increment(long inc) {
+    private IPv4 increment(long inc) {
         List<Short> tmp = new ArrayList<>(4);
         tmp.addAll(ipNumbers);
 

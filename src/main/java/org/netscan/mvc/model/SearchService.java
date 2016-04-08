@@ -6,10 +6,7 @@ import jcifs.smb.SmbFile;
 import org.netscan.core.configuration.Configuration;
 import org.netscan.core.configuration.Filter;
 
-import java.util.List;
-import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.LinkedBlockingQueue;
+import java.util.concurrent.CyclicBarrier;
 
 /**
  * Author Rigoberto Leander Salgado Reyes <rlsalgado2006@gmail.com>
@@ -22,31 +19,23 @@ import java.util.concurrent.LinkedBlockingQueue;
  * MERCHANTABILITY OR FITNESS FOR A PARTICULAR PURPOSE. Please refer to the
  * AGPL (http:www.gnu.org/licenses/agpl-3.0.txt) for more details.
  */
-public class SearchService extends Service<List<SmbFile>> {
-
-    private final Configuration conf;
-    private final BlockingQueue<CountDownLatch> continueQueue;
+public class SearchService extends Service<SmbFile> {
+    final private Configuration configuration;
+    final private CyclicBarrier barrier;
     private Filter filter;
 
-    public SearchService(Configuration conf) {
-        this.conf = conf;
+    public SearchService(Configuration configuration, CyclicBarrier barrier) {
+        this.configuration = configuration;
         filter = null;
-        continueQueue = new LinkedBlockingQueue<>();
+        this.barrier = barrier;
     }
 
     @Override
-    protected Task<List<SmbFile>> createTask() {
-        return new SearchTask(conf, filter, continueQueue);
+    protected Task<SmbFile> createTask() {
+        return new SearchTask(filter, configuration, barrier);
     }
 
     public void setFilter(Filter filter) {
         this.filter = filter;
-    }
-
-    public void canContinue() {
-        final CountDownLatch peek = continueQueue.peek();
-        if (peek != null) {
-            peek.countDown();
-        }
     }
 }

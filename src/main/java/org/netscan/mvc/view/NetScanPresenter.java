@@ -15,6 +15,7 @@ import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jcifs.smb.NtlmPasswordAuthentication;
 import jcifs.smb.SmbException;
+import jcifs.smb.SmbFile;
 import org.netscan.core.configuration.Configuration;
 import org.netscan.core.configuration.ConfigurationUtil;
 import org.netscan.core.configuration.Filter;
@@ -25,6 +26,8 @@ import java.nio.file.Paths;
 import java.time.ZoneId;
 import java.util.Date;
 import java.util.Optional;
+import java.util.concurrent.BrokenBarrierException;
+import java.util.concurrent.CyclicBarrier;
 
 
 /**
@@ -39,21 +42,24 @@ import java.util.Optional;
  * AGPL (http:www.gnu.org/licenses/agpl-3.0.txt) for more details.
  */
 public class NetScanPresenter {
-    private final SettingsView settingsView;
-    private final SearchService searchService;
-    private final NetScanView netScanView;
-    private final Configuration conf;
-    private final ObservableList<Share> list;
+    final private SettingsView settingsView;
+    final private SearchService searchService;
+    final private NetScanView netScanView;
+    final private Configuration configuration;
+    final private ObservableList<Share> list;
+    final private CyclicBarrier barrier;
 
     public NetScanPresenter(NetScanView netScanView) {
         this.netScanView = netScanView;
 
-        conf = ConfigurationUtil.loadConfiguration();
+        configuration = ConfigurationUtil.loadConfiguration();
 
         settingsView = new SettingsView();
-        new SettingsPresenter(settingsView, conf);
+        new SettingsPresenter(settingsView, configuration);
 
-        searchService = new SearchService(conf);
+        barrier = new CyclicBarrier(2);
+
+        searchService = new SearchService(configuration, barrier);
 
         list = FXCollections.observableArrayList();
 
@@ -69,7 +75,8 @@ public class NetScanPresenter {
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
             alert.setResizable(true);
             alert.getDialogPane().setPrefSize(600, 300);
-            stage.getIcons().add(new Image(getClass().getClassLoader().getResource("images/icon.png").toExternalForm()));
+            stage.getIcons().add(new Image(
+                    getClass().getClassLoader().getResource("images/icon.png").toExternalForm()));
             alert.setHeaderText("NetScan v0.1");
             alert.setContentText("Author Rigoberto Leander Salgado Reyes <rlsalgado2006@gmail.com>" +
                     "\n\n" +
@@ -85,9 +92,11 @@ public class NetScanPresenter {
         });
 
         netScanView.exit.setOnAction(e -> {
-            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to exit?", ButtonType.YES, ButtonType.CANCEL);
+            Alert alert = new Alert(Alert.AlertType.CONFIRMATION, "Are you sure you want to exit?",
+                    ButtonType.YES, ButtonType.CANCEL);
             Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
-            stage.getIcons().add(new Image(getClass().getClassLoader().getResource("images/icon.png").toExternalForm()));
+            stage.getIcons().add(new Image(
+                    getClass().getClassLoader().getResource("images/icon.png").toExternalForm()));
             alert.setTitle("Confirmation Dialog");
             Optional<ButtonType> result = alert.showAndWait();
             if (result.get() == ButtonType.YES) Platform.exit();
@@ -96,16 +105,20 @@ public class NetScanPresenter {
         netScanView.filterComboBox.itemsProperty().bind(settingsView.filtersView.listView.itemsProperty());
 
         netScanView.searchButton.setOnAction(e -> searchEvent());
-        netScanView.searchButton.disableProperty().bind(searchService.stateProperty().isEqualTo(Worker.State.RUNNING));
+        netScanView.searchButton.disableProperty().bind(searchService.stateProperty()
+                .isEqualTo(Worker.State.RUNNING));
 
         netScanView.stopButton.setOnAction(e -> searchService.cancel());
-        netScanView.stopButton.disableProperty().bind(searchService.stateProperty().isNotEqualTo(Worker.State.RUNNING));
+        netScanView.stopButton.disableProperty().bind(searchService.stateProperty()
+                .isNotEqualTo(Worker.State.RUNNING));
 
-        netScanView.searchTextField.disableProperty().bind(searchService.stateProperty().isEqualTo(Worker.State.RUNNING));
+        netScanView.searchTextField.disableProperty().bind(searchService.stateProperty()
+                .isEqualTo(Worker.State.RUNNING));
         netScanView.searchTextField.textProperty().addListener((observable, oldValue, newValue) -> {
             if (!newValue.isEmpty()) {
                 final FilteredList<Share> filtered =
-                        list.filtered(dt -> dt.getSmbPath().toLowerCase().contains(newValue.trim().toLowerCase()));
+                        list.filtered(dt -> dt.getSmbPath().toLowerCase()
+                                .contains(newValue.trim().toLowerCase()));
                 netScanView.tableView.setItems(filtered);
             } else {
                 netScanView.tableView.setItems(list);
@@ -121,6 +134,7 @@ public class NetScanPresenter {
         netScanView.credentials.setOnAction(e -> credentialsAction());
 
         netScanView.progressBar.progressProperty().bind(searchService.progressProperty());
+        netScanView.labelProgressBar.textProperty().bind(searchService.messageProperty());
     }
 
     private void credentialsAction() {
@@ -197,21 +211,15 @@ public class NetScanPresenter {
         netScanView.searchTextField.setText("");
         netScanView.tableView.getItems().clear();
         final Filter filter = netScanView.filterComboBox.getValue();
-        if (!conf.getCredentials().isEmpty() && filter != null && !conf.getRanges().isEmpty()) {
+        if (!configuration.getCredentials().isEmpty() && filter != null && !configuration.getRanges().isEmpty()) {
             if (searchService.getState() == Worker.State.READY) {
-                searchService.valueProperty().addListener((observable, oldValue, smbFiles) -> {
-                    if (smbFiles != null && !smbFiles.isEmpty()) {
-                        smbFiles.stream().forEach(sf -> {
-                            try {
-                                final Share share = new Share(sf.getName(), sf.getCanonicalPath(), sf.length(),
-                                        new Date(sf.getDate()).toInstant().atZone(ZoneId.systemDefault()).toLocalDate(),
-                                        (NtlmPasswordAuthentication) sf.getPrincipal());
-                                netScanView.tableView.getItems().add(share);
-                            } catch (SmbException ignored) {
-                            }
-                        });
-
-                        searchService.canContinue();
+                searchService.valueProperty().addListener((observable, oldValue, smbFile) -> {
+                    if (smbFile != null) {
+                        try {
+                            updateTable(smbFile);
+                            barrier.await();
+                        } catch (BrokenBarrierException | InterruptedException e) {
+                        }
                     }
                 });
             }
@@ -227,9 +235,26 @@ public class NetScanPresenter {
         }
     }
 
+    private void updateTable(SmbFile smbFile) {
+        try {
+            netScanView.tableView
+                    .getItems()
+                    .add(new Share(smbFile.getName(),
+                            smbFile.getCanonicalPath(),
+                            smbFile.length(),
+                            new Date(smbFile.getDate())
+                                    .toInstant()
+                                    .atZone(ZoneId.systemDefault())
+                                    .toLocalDate(),
+                            (NtlmPasswordAuthentication) smbFile.getPrincipal()));
+        } catch (SmbException e) {
+        }
+    }
+
     private void onCancelSearch() {
         list.clear();
         list.addAll(netScanView.tableView.getItems());
+        searchService.reset();
     }
 
     private void onSuccessSearch() {

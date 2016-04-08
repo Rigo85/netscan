@@ -1,19 +1,17 @@
 package org.netscan.core;
 
-import jcifs.smb.NtlmPasswordAuthentication;
 import jcifs.smb.SmbFile;
-import org.netscan.core.configuration.Credential;
+import org.netscan.core.configuration.Configuration;
 import org.netscan.core.configuration.Filter;
+import org.netscan.core.configuration.Range;
 import org.netscan.core.ipv4.IPv4;
 
-import java.net.InetSocketAddress;
-import java.net.MalformedURLException;
-import java.net.Socket;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import java.util.stream.Stream;
 
 /**
@@ -28,67 +26,102 @@ import java.util.stream.Stream;
  * AGPL (http:www.gnu.org/licenses/agpl-3.0.txt) for more details.
  */
 public class NetScanCore {
-    private final IPv4 ip;
-    private final Filter filter;
-    private final List<Credential> credentials;
-    private final int timeOut;
+    final private AtomicBoolean stop;
+    final private Filter filter;
+    final private ConcurrentLinkedDeque<SmbFile> files;
+    final private LinkedBlockingQueue<ResourceToSearch> queue;
+    final private ExecutorService threadPool;
+    final private AtomicInteger counter;
+    final private Configuration configuration;
+    final private ResourceToSearch KILL;
+    final private AtomicLong workDone;
+    final private AtomicLong totalToProcess;
 
-    public NetScanCore(IPv4 ip, Filter filter, List<Credential> credentials, int timeOut) {
-        this.ip = ip;
+    public NetScanCore(LinkedBlockingQueue<ResourceToSearch> queue, ConcurrentLinkedDeque<SmbFile> files,
+                       Configuration configuration, Filter filter, AtomicInteger counter, AtomicBoolean stop,
+                       AtomicLong workDone, AtomicLong totalToProcess) {
         this.filter = filter;
-        this.credentials = credentials;
-        this.timeOut = timeOut;
-    }
+        this.configuration = configuration;
+        this.threadPool = Executors.newFixedThreadPool(configuration.getThreads());
+        this.files = files;
+        this.queue = queue;
+        this.counter = counter;
+        this.stop = stop;
+        this.workDone = workDone;
+        this.totalToProcess = totalToProcess;
+        this.KILL = new ResourceToSearch(files, queue, filter, configuration.getTimeOut(),
+                counter, workDone, totalToProcess) {
+            @Override
+            protected void process() {
 
-    private boolean isPortsOpen() {
-        return Arrays.asList(139, 445).stream().map(p -> {
-            try {
-                try (Socket socket = new Socket()) {
-                    socket.connect(new InetSocketAddress(ip.toString(), p), timeOut);
-                    return true;
-                }
-            } catch (Exception ex) {
-                return false;
             }
-        }).allMatch(isPortOpen -> isPortOpen);
+        };
     }
 
-    public List<SmbFile> produceFiles() {
-        List<SmbFile> result = new LinkedList<>();
+    public void produceFiles() {
+        //todo test inside the thread.
+        feedQueue();
 
-        if (isPortsOpen()) {
-            result.addAll(credentials.stream().flatMap(c -> {
-                String domain = c.getDomain().equals("*") ? ip.toString() : c.getDomain();
-                NtlmPasswordAuthentication auth = new NtlmPasswordAuthentication(domain, c.getUserName(), c.getPassword());
-                String url = String.format("smb://%s/", ip);
-                List<SmbFile> files;
-
+        new Thread(() -> {
+            while (true) {
                 try {
-                    files = walk(new SmbFile(url, auth));
-                } catch (MalformedURLException ignored) {
-                    files = Collections.emptyList();
+                    Thread.sleep(1000);
+                    if ((counter.get() == 0 && queue.isEmpty()) || stop.get()) {
+                        if (!stop.get()) {
+                            threadPool.shutdown();
+                        } else {
+                            threadPool.awaitTermination(1, TimeUnit.MILLISECONDS);
+                            queue.clear();
+                        }
+                        queue.put(KILL);
+                        return;
+                    }
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
                 }
+            }
+        }).start();
 
-                return files.stream();
-            }).collect(Collectors.toList()));
-        }
-
-        return result;
+        threadPool.submit(() -> {
+            while (true) {
+                try {
+                    ResourceToSearch resourceToSearch = queue.take();
+                    if (resourceToSearch == KILL) {
+                        return;
+                    }
+                    threadPool.execute(resourceToSearch);
+                } catch (InterruptedException e) {
+                }
+            }
+        });
     }
 
-    private List<SmbFile> walk(SmbFile sf) {
-        List<SmbFile> result = new LinkedList<>();
+    private Stream<String> getIps(Range range) {
+        List<String> ipStrings = new LinkedList<>();
+        IPv4 ip = range.beginIP;
+        final long end = range.endIP.toLong();
 
-        try {
-            if (sf.isFile() && (filter.get(0).equals("*.*") ||
-                    filter.stream().anyMatch(f -> sf.getName().endsWith(f.substring(1))))) {
-                result.add(sf);
-            } else if (sf.isDirectory()) {
-                result.addAll(Stream.of(sf.listFiles()).flatMap(s -> walk(s).stream()).collect(Collectors.toList()));
-            }
-        } catch (Exception ignored) {
+        while (ip.toLong() <= end) {
+            ipStrings.add(ip.toString());
+            ip = ip.increment();
         }
 
-        return result;
+        return ipStrings.stream();
+    }
+
+    private void spooling(String ip) {
+        try {
+            queue.put(new IpToSearch(queue, files, filter, configuration.getTimeOut(), counter,
+                    ip, configuration.getCredentials(), workDone, totalToProcess));
+            totalToProcess.incrementAndGet();
+        } catch (InterruptedException e) {
+        }
+    }
+
+    private void feedQueue() {
+        configuration.getRanges()
+                .stream()
+                .flatMap(this::getIps)
+                .forEach(this::spooling);
     }
 }

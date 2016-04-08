@@ -27,7 +27,6 @@ public class NetScanApp extends Application {
 
     @Override
     public void start(Stage stage) {
-        //todo change from *.png to *.svg
         NetScanView netScanView = new NetScanView();
         new NetScanPresenter(netScanView);
 
@@ -37,7 +36,6 @@ public class NetScanApp extends Application {
 
         stage.setMaximized(true);
 
-        //todo check the search in progress.
         stage.setOnCloseRequest(event -> {
             Alert alert = new Alert(Alert.AlertType.CONFIRMATION,
                     "Are you sure you want to exit?", ButtonType.YES, ButtonType.CANCEL);
@@ -52,5 +50,11 @@ public class NetScanApp extends Application {
                 getClass().getClassLoader().getResource("images/icon.png").toExternalForm()));
 
         stage.show();
+    }
+
+    @Override
+    public void stop() throws Exception {
+        //todo see how to 'kill' the task thread, it remain locked in the await!
+        System.exit(0);
     }
 }
