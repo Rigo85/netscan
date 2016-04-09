@@ -29,6 +29,7 @@ public class NetScanView extends BorderPane {
     MenuItem settings;
     MenuItem exit;
     MenuItem about;
+    MenuItem export;
     ComboBox<Filter> filterComboBox;
     Button searchButton;
     Button stopButton;
@@ -108,9 +109,10 @@ public class NetScanView extends BorderPane {
     }
 
     private void createMenu() {
+        export = new MenuItem("Export result to HTML");
         settings = new MenuItem("Settings");
         exit = new MenuItem("Exit");
-        Menu file = new Menu("File", null, settings, new SeparatorMenuItem(), exit);
+        Menu file = new Menu("File", null, export, settings, new SeparatorMenuItem(), exit);
 
         about = new MenuItem("About");
         Menu help = new Menu("?", null, about);
@@ -157,7 +159,7 @@ public class NetScanView extends BorderPane {
         return lastMCol;
     }
 
-    private String humanReadableByteCount(long bytes, boolean si) {
+    String humanReadableByteCount(long bytes, boolean si) {
         int unit = si ? 1000 : 1024;
         if (bytes < unit) {
             return bytes + " B";

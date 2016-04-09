@@ -7,6 +7,7 @@ import org.netscan.core.configuration.Configuration;
 import org.netscan.core.configuration.Filter;
 
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Author Rigoberto Leander Salgado Reyes <rlsalgado2006@gmail.com>
@@ -23,16 +24,18 @@ public class SearchService extends Service<SmbFile> {
     final private Configuration configuration;
     final private CyclicBarrier barrier;
     private Filter filter;
+    final private AtomicBoolean stop;
 
-    public SearchService(Configuration configuration, CyclicBarrier barrier) {
+    public SearchService(Configuration configuration, CyclicBarrier barrier, AtomicBoolean stop) {
         this.configuration = configuration;
         filter = null;
         this.barrier = barrier;
+        this.stop = stop;
     }
 
     @Override
     protected Task<SmbFile> createTask() {
-        return new SearchTask(filter, configuration, barrier);
+        return new SearchTask(filter, configuration, barrier, stop);
     }
 
     public void setFilter(Filter filter) {

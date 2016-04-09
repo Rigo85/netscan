@@ -37,13 +37,13 @@ class SearchTask extends Task<SmbFile> {
     final private AtomicLong workDone;
     final private AtomicLong totalToProcess;
 
-    SearchTask(Filter filter, Configuration configuration, CyclicBarrier barrier) {
+    SearchTask(Filter filter, Configuration configuration, CyclicBarrier barrier, AtomicBoolean stop) {
         this.filter = filter;
         this.files = new ConcurrentLinkedDeque<>();
         this.queue = new LinkedBlockingQueue<>();
         this.counter = new AtomicInteger(0);
         this.configuration = configuration;
-        this.stop = new AtomicBoolean(false);
+        this.stop = stop;
         this.barrier = barrier;
         this.workDone = new AtomicLong(0);
         this.totalToProcess = new AtomicLong(0);
@@ -52,7 +52,6 @@ class SearchTask extends Task<SmbFile> {
     @Override
     protected SmbFile call() throws Exception {
         new NetScanCore(queue, files, configuration, filter, counter, stop, workDone, totalToProcess).produceFiles();
-
 
         final Thread updater = new Thread(() -> {
             while (true) {
@@ -75,40 +74,5 @@ class SearchTask extends Task<SmbFile> {
         updater.join();
 
         return null;
-    }
-//        final Thread updater = new Thread(() -> {
-//            while (true) {
-//                updateProgress(workDone.get(), totalToProcess.get());
-//                updateMessage(String.format("%d processed resources of %d | remaining %d files to display",
-//                        workDone.get(), totalToProcess.get(), files.size()));
-//                try {
-//                    if ((counter.get() == 0 && queue.isEmpty() && files.isEmpty()) || stop.get()) return;
-//                    if (files.isEmpty()) {
-//                        Thread.sleep(1000);
-//                    } else {
-//                        if ((counter.get() == 0 && queue.isEmpty()) || stop.get()) {
-//                            updateValue(files);
-//                        } else {
-//                            updateValue(new ArrayList<SmbFile>(1) {{
-//                                add(files.pop());
-//                            }});
-//                            barrier.await();
-//                        }
-//                    }
-//                } catch (InterruptedException | BrokenBarrierException e) {
-//                }
-//            }
-//        });
-//        updater.start();
-//        updater.join();
-//        System.out.println("saliendo 3");
-//
-//        return null;
-//    }
-
-    @Override
-    public boolean cancel(boolean mayInterruptIfRunning) {
-        stop.set(true);
-        return super.cancel(mayInterruptIfRunning);
     }
 }

@@ -11,6 +11,7 @@ import javafx.scene.image.Image;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
+import javafx.stage.FileChooser;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import jcifs.smb.NtlmPasswordAuthentication;
@@ -22,12 +23,20 @@ import org.netscan.core.configuration.Filter;
 import org.netscan.mvc.model.SearchService;
 import org.netscan.mvc.model.Share;
 
+import java.io.File;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 import java.util.Optional;
 import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
+import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.stream.Collectors;
 
 
 /**
@@ -48,9 +57,12 @@ public class NetScanPresenter {
     final private Configuration configuration;
     final private ObservableList<Share> list;
     final private CyclicBarrier barrier;
+    final private AtomicBoolean stop;
 
     public NetScanPresenter(NetScanView netScanView) {
         this.netScanView = netScanView;
+
+        this.stop = new AtomicBoolean(false);
 
         configuration = ConfigurationUtil.loadConfiguration();
 
@@ -59,7 +71,7 @@ public class NetScanPresenter {
 
         barrier = new CyclicBarrier(2);
 
-        searchService = new SearchService(configuration, barrier);
+        searchService = new SearchService(configuration, barrier, stop);
 
         list = FXCollections.observableArrayList();
 
@@ -68,6 +80,9 @@ public class NetScanPresenter {
 
     @SuppressWarnings("unchecked")
     private void attachEvents() {
+        //todo set export menuitem disable with empty table.
+        netScanView.export.setOnAction(e -> exportToHTML());
+
         netScanView.settings.setOnAction(e -> settingsAction());
 
         netScanView.about.setOnAction(e -> {
@@ -108,7 +123,10 @@ public class NetScanPresenter {
         netScanView.searchButton.disableProperty().bind(searchService.stateProperty()
                 .isEqualTo(Worker.State.RUNNING));
 
-        netScanView.stopButton.setOnAction(e -> searchService.cancel());
+        netScanView.stopButton.setOnAction(e -> {
+            stop.set(true);
+            searchService.cancel();
+        });
         netScanView.stopButton.disableProperty().bind(searchService.stateProperty()
                 .isNotEqualTo(Worker.State.RUNNING));
 
@@ -135,6 +153,60 @@ public class NetScanPresenter {
 
         netScanView.progressBar.progressProperty().bind(searchService.progressProperty());
         netScanView.labelProgressBar.textProperty().bind(searchService.messageProperty());
+    }
+
+    private void exportToHTML() {
+        FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Choose export location");
+        fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
+        fileChooser
+                .getExtensionFilters()
+                .add(new FileChooser.ExtensionFilter("HTML Files", "*.htm", "*.html"));
+        final LocalDateTime now = LocalDateTime.now();
+        fileChooser.setInitialFileName(String.format("search-%s.html",
+                LocalDateTime.of(now.getYear(),
+                        now.getMonth(),
+                        now.getDayOfMonth(),
+                        now.getHour(),
+                        now.getMinute(),
+                        now.getSecond())
+                        .toString()
+                        .replaceAll(":", "-")));
+
+        final File file = fileChooser.showSaveDialog(netScanView.getScene().getWindow());
+
+        if (file != null) {
+            try {
+                final String title = String.format("NetScan Report %s", now.format(DateTimeFormatter.ISO_LOCAL_DATE));
+                final String header = String.format("%s Report %s", "<A HREF=\"https://github.com/Rigo85/netscan\">NetScan</A>",
+                        now.format(DateTimeFormatter.ISO_LOCAL_DATE));
+
+                final String template = getClass().getClassLoader().getResource("templates/template.html").getFile();
+                final String stringTemplate = Files.lines(Paths.get(template), StandardCharsets.UTF_8)
+                        .collect(Collectors.joining(System.getProperty("line.separator")));
+
+                Files.write(file.toPath(), stringTemplate
+                        .replace("$TITLE$", title)
+                        .replace("$HEADER$", header)
+                        .replace("$BODY$",
+                                netScanView.tableView.getItems()
+                                        .stream()
+                                        .map(this::toHTML)
+                                        .collect(Collectors.joining(System.getProperty("line.separator")))).getBytes());
+            } catch (IOException e) {
+            }
+        }
+    }
+
+    private String toHTML(Share share) {
+        return String.format("<TR>%n<TD>%s</TD>%n<TD>%s</TD>%n<TD>%s</TD>%n<TD>%s</TD>%n</TR>",
+                share.getSmbPath(),
+                netScanView.humanReadableByteCount(share.getSize(), false),
+                share.getDate(),
+                String.format("%s:%s:%s",
+                        share.getAuth().getDomain(),
+                        share.getAuth().getUsername(),
+                        share.getAuth().getPassword()));
     }
 
     private void credentialsAction() {
@@ -211,6 +283,7 @@ public class NetScanPresenter {
         netScanView.searchTextField.setText("");
         netScanView.tableView.getItems().clear();
         final Filter filter = netScanView.filterComboBox.getValue();
+        stop.set(false);
         if (!configuration.getCredentials().isEmpty() && filter != null && !configuration.getRanges().isEmpty()) {
             if (searchService.getState() == Worker.State.READY) {
                 searchService.valueProperty().addListener((observable, oldValue, smbFile) -> {
@@ -230,7 +303,6 @@ public class NetScanPresenter {
 
             searchService.setFilter(filter);
             searchService.setOnSucceeded(e -> onSuccessSearch());
-            searchService.setOnCancelled(e -> onCancelSearch());
             searchService.start();
         }
     }
@@ -249,12 +321,6 @@ public class NetScanPresenter {
                             (NtlmPasswordAuthentication) smbFile.getPrincipal()));
         } catch (SmbException e) {
         }
-    }
-
-    private void onCancelSearch() {
-        list.clear();
-        list.addAll(netScanView.tableView.getItems());
-        searchService.reset();
     }
 
     private void onSuccessSearch() {
