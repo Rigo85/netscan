@@ -123,10 +123,7 @@ public class NetScanPresenter {
         netScanView.searchButton.disableProperty().bind(searchService.stateProperty()
                 .isEqualTo(Worker.State.RUNNING));
 
-        netScanView.stopButton.setOnAction(e -> {
-            stop.set(true);
-            searchService.cancel();
-        });
+        netScanView.stopButton.setOnAction(e -> stop.set(true));
         netScanView.stopButton.disableProperty().bind(searchService.stateProperty()
                 .isNotEqualTo(Worker.State.RUNNING));
 
