@@ -156,8 +156,7 @@ public class NetScanPresenter {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Choose export location");
         fileChooser.setInitialDirectory(new File(System.getProperty("user.dir")));
-        fileChooser
-                .getExtensionFilters()
+        fileChooser.getExtensionFilters()
                 .add(new FileChooser.ExtensionFilter("HTML Files", "*.htm", "*.html"));
         final LocalDateTime now = LocalDateTime.now();
         fileChooser.setInitialFileName(String.format("search-%s.html",

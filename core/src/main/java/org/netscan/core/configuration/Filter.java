@@ -44,7 +44,7 @@ public class Filter {
                 .boxed()
                 .map(i -> filters.subList(i, i + size > filters.size() ? filters.size() : i + size))
                 .map(l -> l.stream().collect(Collectors.joining(", ")))
-                .collect(Collectors.joining(System.getProperty("line.separator")));
+                .collect(Collectors.joining("," + System.getProperty("line.separator")));
     }
 
     public String get(int i) {
