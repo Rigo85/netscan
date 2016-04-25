@@ -23,9 +23,10 @@ import org.netscan.core.configuration.Filter;
 import org.netscan.mvc.model.SearchService;
 import org.netscan.mvc.model.Share;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
-import java.nio.charset.StandardCharsets;
+import java.io.InputStreamReader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.LocalDateTime;
@@ -37,6 +38,7 @@ import java.util.concurrent.BrokenBarrierException;
 import java.util.concurrent.CyclicBarrier;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 
 /**
@@ -171,15 +173,18 @@ public class NetScanPresenter {
 
         final File file = fileChooser.showSaveDialog(netScanView.getScene().getWindow());
 
+        System.out.println(file == null ? "null" : file.getAbsolutePath());
+
         if (file != null) {
             try {
                 final String title = String.format("NetScan Report %s", now.format(DateTimeFormatter.ISO_LOCAL_DATE));
                 final String header = String.format("%s Report %s", "<A HREF=\"https://github.com/Rigo85/netscan\">NetScan</A>",
                         now.format(DateTimeFormatter.ISO_LOCAL_DATE));
 
-                final String template = getClass().getClassLoader().getResource("templates/template.html").getFile();
-                final String stringTemplate = Files.lines(Paths.get(template), StandardCharsets.UTF_8)
-                        .collect(Collectors.joining(System.getProperty("line.separator")));
+                Stream<String> stream = new BufferedReader(new InputStreamReader(
+                        ClassLoader.getSystemResourceAsStream("templates/template.html"))).lines();
+
+                final String stringTemplate = stream.collect(Collectors.joining(System.getProperty("line.separator")));
 
                 Files.write(file.toPath(), stringTemplate
                         .replace("$TITLE$", title)
